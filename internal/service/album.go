@@ -20,15 +20,11 @@ func NewAlbumService(db *sql.DB) *AlbumService {
 }
 
 func (s *AlbumService) CreateAlbum(album *Album) error {
-	query := "INSERT INTO ALBUMS (title, artist, price) values(?,?,?)"
+	var lastInsertId int
 
-	result, err := s.db.Exec(query, album.Title, album.Artist, album.Price)
+	query := "INSERT INTO albums (title, artist, price) VALUES($1,$2,$3) RETURNING id"
 
-	if err != nil {
-		return err
-	}
-
-	lastInsertId, err := result.LastInsertId()
+	err := s.db.QueryRow(query, album.Title, album.Artist, album.Price).Scan(&lastInsertId)
 
 	if err != nil {
 		return err
@@ -65,7 +61,7 @@ func (s *AlbumService) GetAlbums() ([]Album, error) {
 }
 
 func (s *AlbumService) GetAlbumByID(id int) (*Album, error) {
-	query := "SELECT id, title, artist, price FROM albums WHERE id = ?"
+	query := "SELECT id, title, artist, price FROM albums WHERE id =$1"
 	row := s.db.QueryRow(query, id)
 
 	var album Album

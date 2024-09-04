@@ -56,3 +56,23 @@ func (h *AlbumHandlers) GetAlbumByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(album)
 }
+
+func (h *AlbumHandlers) CreateAlbum(w http.ResponseWriter, r *http.Request) {
+	var album service.Album
+
+	err := json.NewDecoder(r.Body).Decode(&album)
+
+	if err != nil {
+		http.Error(w, "Invalid Request Payload!", http.StatusBadRequest)
+		return
+
+	}
+
+	if err := h.service.CreateAlbum(&album); err != nil {
+		http.Error(w, "Internal Server Error!", http.StatusInternalServerError)
+		return
+
+	}
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(album)
+}

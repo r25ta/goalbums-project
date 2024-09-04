@@ -30,6 +30,7 @@ func main() {
 
 	router.HandleFunc("GET /albums", albumHandlers.GetAlbums)
 	router.HandleFunc("GET /albums/{id}", albumHandlers.GetAlbumByID)
+	router.HandleFunc("POST /albums", albumHandlers.CreateAlbum)
 
 	log.Println("Server is running on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", router))
