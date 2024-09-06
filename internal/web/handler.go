@@ -76,3 +76,52 @@ func (h *AlbumHandlers) CreateAlbum(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(album)
 }
+
+func (h *AlbumHandlers) UpdateAlbum(w http.ResponseWriter, r *http.Request) {
+
+	strId := r.PathValue("id")
+
+	id, err := strconv.Atoi(strId)
+
+	if err != nil {
+		http.Error(w, "Invalid Album ID", http.StatusBadGateway)
+	}
+
+	var album service.Album
+
+	if err := json.NewDecoder(r.Body).Decode(&album); err != nil {
+		http.Error(w, "Invalid Request Payload!", http.StatusBadRequest)
+		return
+	}
+
+	album.ID = id
+
+	err = h.service.UpdateAlbum(&album)
+
+	if err != nil {
+		http.Error(w, "Failed to Update Album", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(album)
+
+}
+
+func (h *AlbumHandlers) DeleteAlbum(w http.ResponseWriter, r *http.Request) {
+	strId := r.PathValue("id")
+	id, err := strconv.Atoi(strId)
+
+	if err != nil {
+		http.Error(w, "Invalid Album ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.service.DeleteAlbum(id); err != nil {
+		http.Error(w, "Failed to Delete Album ID "+strId, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}

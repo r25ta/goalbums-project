@@ -30,7 +30,7 @@ func (s *AlbumService) CreateAlbum(album *Album) error {
 		return err
 	}
 
-	album.ID = int(lastInsertId)
+	album.ID = lastInsertId
 
 	return nil
 }
@@ -76,7 +76,7 @@ func (s *AlbumService) GetAlbumByID(id int) (*Album, error) {
 }
 
 func (s *AlbumService) UpdateAlbum(album *Album) error {
-	query := "UPDATE albums SET title = ?, artist = ?, price = ? WHERE id = ?"
+	query := "UPDATE albums SET title = $1, artist = $2, price = $3 WHERE id = $4"
 
 	_, err := s.db.Exec(query, album.Title, album.Artist, album.Price, album.ID)
 
@@ -84,7 +84,7 @@ func (s *AlbumService) UpdateAlbum(album *Album) error {
 }
 
 func (s *AlbumService) DeleteAlbum(id int) error {
-	query := "DELETE FROM albums WHERE id = ?"
+	query := "DELETE FROM albums WHERE id = $1"
 
 	_, err := s.db.Exec(query, id)
 
